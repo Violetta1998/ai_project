@@ -21,14 +21,16 @@ int main(int argc, char* argv[]) {
 
 	namedWindow("image with lines", WINDOW_FREERATIO);
 	namedWindow("mask with points", WINDOW_FREERATIO);
-	for (int i = 0; i < 200;i++) {
+
+	string sNull("00000");
+	for (int i = 0; i < 400;i++) {
 		srand(time(NULL));
 		int figure = rand() % 5 + 1;
 		switch (figure) {
 		case 1: {//checkerboards
 			int x1 = rand() % 20 + 1;
 			int y1 = rand() % 20 + 1;
-			int y2 = rand() % 40 + 20;
+			int y2 = rand() % 40 + 25;
 			int diaposonX = rand() % 20 + 5;
 			int diaposonY = y2 - y1;
 			int x2 = x1 + diaposonX;
@@ -60,9 +62,9 @@ int main(int argc, char* argv[]) {
 		}
 		case 2: {//не пересекающиеся линии
 			int a = rand() % 11 + (-5);//наклон
-			int x = 3;
-			int d = rand() % 20 + 1;//пересечение с oY
-			int diaposon = rand() % 8 + 1;
+			int x = 15;
+			int d = rand() % 50 + 1;//пересечение с oY
+			int diaposon = rand() % 30 + 15;
 			int count = rand() % 8 + 3;
 			//y1 = a*x+d
 			for (int i = 0; i < count; i++) {
@@ -73,9 +75,9 @@ int main(int argc, char* argv[]) {
 					circle(gray, p2, 1, color2, -1);
 				}
 				
-				diaposon = rand() % (x + diaposon + 10) + 10;
+				diaposon = rand() % (x + diaposon + 10) + 15;
 				a = rand() % 11 + (-5);
-				d = rand() % 20 + 1;
+				d = rand() % 50 + 1;
 			}
 			break;
 		}
@@ -119,8 +121,8 @@ int main(int argc, char* argv[]) {
 		case 4: {//stars
 			int diaposon = rand() % 20 + (-10);
 			int x = rand() % 15 + 5;
-			int a = rand() % 5 + 1;//наклон
-			int d = rand() % 20 + 10;//пересечение с oY
+			int a = rand() % 5 + 1;
+			int d = rand() % 20 + 10;
 			int a1(a);
 			int d1(d);
 			srand(time(NULL));
@@ -132,23 +134,23 @@ int main(int argc, char* argv[]) {
 					line(copyImg, p1, p2, color, thickness);
 					circle(gray, p1, 1, color2, -1);
 					circle(gray, p2, 1, color2, -1);
-					
+
 					diaposon = rand() % 20 + (-10);
 					a = rand() % 10 + 1;
 					d = rand() % 20 + 10;
 				}
 			}
-			break;
+			break; 
 		}
 		case 5: {//cube
 			int x1 = rand() % 10 + 3;
-			int x2 = rand() % 30 + 13;
-			int x3 = rand() % 50 + 33;
+			int x2 = rand() % 30 + 15;
+			int x3 = rand() % 50 + 35;
 			int diaposonX = x3 - (x2 - x1);
 
 			int y1 = rand() % 10 + 3;
-			int y2 = rand() % 30 + 13;
-			int y3 = rand() % 50 + 33;
+			int y2 = rand() % 30 + 15;
+			int y3 = rand() % 50 + 35;
 			int diaposonY = y2 - y1;
 
 			rectangle(copyImg, Point(x1, y1), Point(x2, y2), color, thickness);
@@ -171,10 +173,16 @@ int main(int argc, char* argv[]) {
 		default:
 			break;
 		}
+		if (i > 9) {
+			sNull="0000";
+		}
+		if (i > 99) {
+			sNull = "000";
+		}
 		imshow("image with lines", copyImg);
 		imshow("mask with points", gray);
-		const string nameOrig("C:/images/original/" + std::to_string(i) + ".jpg");
-		const string nameMask("C:/images/mask/" + std::to_string(i) + ".jpg");
+		const string nameOrig("C:/images/original/" + sNull+std::to_string(i) + ".png");
+		const string nameMask("C:/images/mask/" + sNull+std::to_string(i) + ".png");
 		imwrite(nameOrig, copyImg);
 		imwrite(nameMask, gray);
 		copyImg = img.clone();
@@ -185,6 +193,7 @@ int main(int argc, char* argv[]) {
 		}
 
 	}
+
 		waitKey(0);
 		return 0;
 }
