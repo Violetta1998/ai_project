@@ -8,25 +8,59 @@
 using namespace cv;
 using namespace std;
 
+void translateImg(Mat copyImg) {
+	Size sizeImg(copyImg.cols, copyImg.rows);//width, height
+	float M[2][3] = { { 1,0,rand()%100+40 },{ 0,1,rand() % 100 + 40 } };
+	Mat imgAffine = copyImg.clone();
+	Mat M2(2, 3, CV_32F, M);//convert mass to Mat
+	warpAffine(copyImg, imgAffine, M2, sizeImg);
+	imshow("affine", imgAffine);
+}
+
+void rotateImg(Mat copyImg) {
+	Mat M = getRotationMatrix2D(Point2f(copyImg.cols / 2, copyImg.rows / 2), rand()%180+30, 1);
+	Mat imgAffine = copyImg.clone();
+	warpAffine(copyImg, imgAffine, M, Size(copyImg.cols, copyImg.rows));
+	imshow("affine", imgAffine);
+}
+
+void affineTransormation(Mat copyImg, Point p1, Point p2, Point p3) {//надо?
+	int random = rand() % 100 + 10;
+	float pts1[3][2] = { {p1.x,p1.y},{p2.x,p2.y},{p3.x,p3.y} };
+	float pts2[3][2] = { {p1.x+random,p1.y+random},{p2.x-random,p2.y-random},{p3.x+random,p3.y-random} };
+	Mat M = getAffineTransform(Mat(3,2,CV_32F,pts1), Mat(3, 2, CV_32F, pts2));
+	
+	Mat imgAffine = copyImg.clone();
+	warpAffine(copyImg, imgAffine, M, Size(copyImg.cols, copyImg.rows));
+	imshow("affine", imgAffine);
+}
+
+void scaleImg(Mat copyImg) {
+	Mat imgAffine = copyImg.clone();
+	resize(copyImg, imgAffine, Size(copyImg.cols, copyImg.cols),2,2,INTER_CUBIC);
+	imshow("affine", imgAffine);
+}
+
 int main(int argc, char* argv[]) {
 	Mat img=imread("back.jpg",1);
 	Mat copyImg = img.clone();
 	Mat gray; cvtColor(copyImg, gray, CV_BGR2GRAY);
 	threshold(gray, gray, 128, 0, THRESH_BINARY);
 	Mat grayCopy = gray.clone();
-
+	
 	Scalar color(0, 0, 0);
 	Scalar color2(255, 255, 255);
 	double thickness = 1.5;
 
 	namedWindow("image with lines", WINDOW_FREERATIO);
 	namedWindow("mask with points", WINDOW_FREERATIO);
+	namedWindow("affine", WINDOW_FREERATIO);
 
 	string sNull("00000");
 	for (int i = 0; i < 400;i++) {
 		srand(time(NULL));
 		int figure = rand() % 5 + 1;
-		switch (figure) {
+		switch (1) {
 		case 1: {//checkerboards
 			int x1 = rand() % 20 + 1;
 			int y1 = rand() % 20 + 1;
@@ -38,6 +72,7 @@ int main(int argc, char* argv[]) {
 			int countY(0);
 			int repeat = rand() % 10 + 4;
 			if (repeat % 2 != 0) { repeat -= 1;}
+			
 			//cv::RotatedRect rect(Point2f(x2-x1,y2-y1),Size2f(diaposonY,diaposonX),33);
 			for (int i = 0; i < repeat; i++) {
 				Point p1(x1 + countX*diaposonX, y1 + countY*diaposonY);
@@ -58,6 +93,7 @@ int main(int argc, char* argv[]) {
 					countY++;
 				}
 			}
+			//affineTransormation(copyImg, Point((x1 + countX*diaposonX, y1 + countY*diaposonY)), Point((x2 + countX*diaposonX, y2 + countY*diaposonY)), Point(x1, y1));
 			break;
 		}
 		case 2: {//не пересекающиеся линии
@@ -181,13 +217,14 @@ int main(int argc, char* argv[]) {
 		}
 		imshow("image with lines", copyImg);
 		imshow("mask with points", gray);
-		const string nameOrig("C:/images/original/" + sNull+std::to_string(i) + ".png");
+		
+		/*const string nameOrig("C:/images/original/" + sNull+std::to_string(i) + ".png");
 		const string nameMask("C:/images/mask/" + sNull+std::to_string(i) + ".png");
 		imwrite(nameOrig, copyImg);
-		imwrite(nameMask, gray);
+		imwrite(nameMask, gray);*/
 		copyImg = img.clone();
 		gray = grayCopy.clone();
-		char c = (char)waitKey(3000);
+		char c = (char)waitKey(30000);
 		if (waitKey(30)==27) {
 			break;
 		}
